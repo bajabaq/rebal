@@ -1,0 +1,6 @@
+pandas==0.25.1
+matplotlib==3.0.2
+numpy==1.16.2
+yfinance==0.1.55
+PySimpleGUI==4.38.0
+python_dateutil==2.8.1

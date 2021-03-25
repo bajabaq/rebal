@@ -1,0 +1,4 @@
+asset_class,symbol,quantity,price,price_update_date,user_roi,roi,roi_update_date,description,multi,multi_update_date
+US Fixed Income,BND,45,84.43000030517578125,2021-03-20 23:38:38.372845,0.05,0.05557445638235203,2021-02-21 19:32:55.653332,Vanguard Total Bond Market Index Fund,,
+US Large Cap Equities,VTI,10,205.2599945068359375,2021-03-20 23:39:09.905005,0.10,0.2198778476569709,2021-02-21 19:32:55.980128,Vanguard Total Stock Market Index Fund,,
+International Equities,DUMMY3,0,5,2021-02-10 22:58:12.571620,0.05,0,02/18/21 10:43 PM,dummy3,,
