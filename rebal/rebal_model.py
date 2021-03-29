@@ -535,12 +535,14 @@ def getoutfile(topdir,suffix):
     return outfile
 #enddef
 
-def savefile(outfile):
-    #ofile is dir\temp.html
+def savefile(outfileX):
+    #ofile is dir\tempX.html
+    suffix = os.path.splitext(outfileX)[0][-1]
     tnow   = datetime.datetime.today().strftime('%Y%m%d-%H%M%S')
-    ofile2 = outfile.replace(getprefix(),tnow)
+    ofile2 = outfileX.replace(getprefix(suffix),tnow)
     print("saving file: ",ofile2)
-    shutil.copy(outfile,ofile2)   
+    shutil.copy(outfileX,ofile2)
+    time.sleep(1)
 #enddef
 
 

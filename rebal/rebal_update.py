@@ -23,6 +23,10 @@ import time
 import webbrowser
 import yfinance as yf
 
+from rebal import finance_plot_aux
+
+#GOT TO FIGURE THIS OUT
+#from .tadconfig import tadconfig
 from rebal.tadconfig import tadconfig
 #from tadconfig import tadconfig
 
@@ -76,6 +80,7 @@ def get_price(symbol, old_price, utime):
     print(tsymbol)
     thist     = tsymbol.history(period='5d')  #was 1d but fails on mutual funds
     new_price = decimal.Decimal(thist.iloc[-1]['Close']) #get closing price from last row
+    new_price = new_price.quantize(decimal.Decimal('0.0001'),rounding=decimal.ROUND_HALF_UP)
         
     #tinfo     = tsymbol.info
     #new_price = decimal.Decimal(tinfo['previousClose'])
@@ -110,7 +115,7 @@ def get_val_manual(desc, title, old_val):
 # typically since inception (to figure what might happen in future)
 # if a specific date, then maybe use for future tax determination  TODO
 #------------------------------------------------------------------------------
-def get_roi(symbol, old_roi, sdate):
+def get_roi(symbol, old_roi, sdate, fassets):
     roi = old_roi
 
     print("getting new data for " + symbol + ":")           
@@ -120,6 +125,18 @@ def get_roi(symbol, old_roi, sdate):
     else:
         thist = tsymbol.history(period='max') #don't have anything else defined yet
     #endif
+
+    assets_dir = os.path.dirname(fassets)
+    data_dir   = os.path.dirname(assets_dir)
+    hist_file  = os.path.join(os.path.join(data_dir,"ticker"),symbol+"-data.csv")
+    
+    thist.to_csv(hist_file,sep='\t',encoding='utf-8')
+
+    (adates,aval,_ph,_pl) = finance_plot_aux.read_data(hist_file)    
+
+    (_aval2,_ays,_m,_b,_rms,_A,_B,_o,_rms2,roi_percent) = finance_plot_aux.fit(adates,aval)
+
+    """
     final_price = thist.iloc[-1]['Close'] #get closing price from last row
     init_price  = thist.iloc[0]['Close']  #get closing price from first row
 
@@ -131,8 +148,11 @@ def get_roi(symbol, old_roi, sdate):
     print(final_price,init_price,years)
     
     roi = ((final_price - init_price)/init_price) / years
+    """
+    roi = round(roi_percent/100,6)
+    
     print("roi",roi)
-
+    
     #what about dividends/cap gains? (this for specific holdings to be implemented later)
     #roi = (((final-init)*shares + dividends - commissions) / (init*shares))*100
     
@@ -420,7 +440,7 @@ def update_assets_aux(fassets,asset_key,asset_dt_key,variable,override):
                         if "unlisted" == symbol:
                             new_val = get_val_manual(desc,"ROI Update", asset_val)
                         else:
-                            new_val = get_roi(symbol, asset_val, variable)
+                            new_val = get_roi(symbol, asset_val, variable,fassets)
                         #endif
                     elif asset_key == 'multi':
                         if asset_class == 'multi':
@@ -471,13 +491,13 @@ def update_multi(fassets, fglide_path,override):
 if __name__ == "__main__":
     print("in the main")
 
-    top  ='/home/tad/Desktop/rebal/data'
+    top  ='/home/tad/Documents/projects/rebal/data'
 #    fglide_path = os.path.join(os.path.join(top,'glide_paths'),'5050gp0.csv')
     fglide_path = os.path.join(os.path.join(top,'glide_paths'),'vanguardtr.csv')
-    fassets     = os.path.join(os.path.join(top,'assets'),'1fundmulti40a.csv')
+    fassets     = os.path.join(os.path.join(top,'assets'),'tad.csv')
     fusers      = os.path.join(os.path.join(top,'users'),'5050u.csv')
 
     #update_prices(fassets)
-    update_multi(fassets,fglide_path,True)
+    update_rois(fassets,True)
     
 #endif
